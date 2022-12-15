@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "baseUrl": "./",    
+    "declaration": true,
+    "declarationDir": "./dist/types",
+    "esModuleInterop": false,
+    "forceConsistentCasingInFileNames": true, /* Ensure that casing is correct in imports. */
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmitOnError": true,
+    "lib": [
+      "es2017"
+    ],    
+  },
+  "include": ["./src/**/*.ts"]
+}
