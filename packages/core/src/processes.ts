@@ -1,46 +1,24 @@
-import { WorkflowEvent, WorkflowEventEmitter, WorkflowEventHandler } from "./events";
+import { WorkflowEventDefinition, WorkflowEventEmitter } from "./events";
 
-export type WorkflowProcessStartFunction<T> = () => T;
-export type WorkflowProcessStopFunction<T> = () => T;
-
-export type WorkflowProcess<T> = { 
-
-    start: WorkflowProcessStartFunction<T>; 
-    stop: WorkflowProcessStopFunction<T> 
+export type WorkflowProcessEventHandlerContext<E> = { 
+    emit: { [K in keyof E]: WorkflowEventEmitter<E[K]> };    
 }
 
-export type WorkflowProcessEventContext<E> = { 
-    emit: { [K in keyof E]: WorkflowEventEmitter<E[K]> };
-    on: { [K in keyof E]: WorkflowEventHandler<E[K]> };
-}
+export type WorkflowProcessEventHandler<E,T> = (data: T, ctx: WorkflowProcessEventHandlerContext<E>)=>void;
 
-export type WorkflowProcessFactory<E,T> = (context: WorkflowProcessEventContext<E>) => WorkflowProcess<T>;
+export type WorkflowProcess<E> = { 
+    [K in keyof E]+?: WorkflowProcessEventHandler<E,E[K]>;
+}
 
 export type WorkflowProcessDefinition<E,P> = {
-    [K in keyof P]: WorkflowProcessFactory<E,P[K]>;
+    [K in keyof P]: WorkflowProcess<E>;
 }
 
-type DefineProcessOptions<E,T> = {
-    factory: WorkflowProcessFactory<E,T> 
+type DefineProcessOptions<E> = {
+    [K in keyof E]+?: WorkflowProcessEventHandler<E,E[K]>;
 }
 
-export function defineProcess<E,T>( factory: WorkflowProcessFactory<E,T>  ) {   
-    return factory;
+export function defineProcess<E>(events: WorkflowEventDefinition<E>, options: DefineProcessOptions<E> ) {
+    return options as WorkflowProcess<E>;
 }
 
-
-export function defineJavascriptProcess<E>( callback: (ctx: WorkflowProcessEventContext<E>)=>void ) {
-    const factory : WorkflowProcessFactory<E,void>  = (ctx)=> {
-        const process : WorkflowProcess<void> = {
-            start: ()=> {
-                callback(ctx);
-            },
-            stop: () => {
-                
-            }
-        }
-        return process;
-    }
-
-    return factory;
-}
