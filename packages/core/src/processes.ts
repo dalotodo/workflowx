@@ -1,4 +1,4 @@
-import { WorkflowEventDefinition, WorkflowEventEmitter } from "./events";
+import { WorkflowEvent, WorkflowEventDefinition, WorkflowEventEmitter } from "./events";
 
 export type WorkflowProcessEventHandlerContext<E> = { 
     emit: { [K in keyof E]: WorkflowEventEmitter<E[K]> };    
@@ -11,14 +11,28 @@ export type WorkflowProcess<E> = {
 }
 
 export type WorkflowProcessDefinition<E,P> = {
-    [K in keyof P]: WorkflowProcess<E>;
+    [K in keyof P]: WorkflowProcessFactory<E>;
 }
 
-type DefineProcessOptions<E> = {
-    [K in keyof E]+?: WorkflowProcessEventHandler<E,E[K]>;
+// type DefineProcessOptions<E> = {
+//     [K in keyof E]+?: WorkflowProcessEventHandler<E,E[K]>;
+// }
+
+
+
+type WorkflowProcessFactory<E> = {
+    (ctx: WorkflowProcessDefinitionContext<E>): void;
 }
 
-export function defineProcess<E>(events: WorkflowEventDefinition<E>, options: DefineProcessOptions<E> ) {
-    return options as WorkflowProcess<E>;
+type WorkflowProcessDefinitionContext<E> = {
+    // events: WorkflowEventDefinition<E>;
+    emit<K extends keyof E>(eventName:  K, data: E[K]): void;
+    on<K extends keyof E>(eventName:  K, handler: WorkflowProcessEventHandler<E,E[K]>): void;
+}
+
+
+export function defineProcess<E>(events: WorkflowEventDefinition<E>, callback: WorkflowProcessFactory<E> ) {
+
+    return callback;
 }
 

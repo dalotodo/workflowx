@@ -1,12 +1,12 @@
-import { Subject, Subscription } from "rxjs";
+
 
 export type WorkflowEventEmitter<T> = (data: T) => void;
 export type WorkflowEventHandlerCallback<T> = (data: T) => void;
 export type WorkflowEventHandler<T> = (callback: WorkflowEventHandlerCallback<T>) => void;
 
-export interface WorkflowEvent<T> { 
-    emit: WorkflowEventEmitter<T>; 
-    on: WorkflowEventHandler<T> 
+export interface WorkflowEvent<T> {
+    emit: WorkflowEventEmitter<T>;
+    on: WorkflowEventHandler<T>
 };
 
 // export type WorkflowEventFactory<T> = () => WorkflowEvent<T>;
@@ -25,25 +25,26 @@ type WorkflowEventEmmiterDefition<E> = {
 }
 
 export function defineEvent<T>(options?: DefineEventOptions<T>) {
-    const callbacks : WorkflowEventHandlerCallback<T>[] = [];
+    const callbacks: WorkflowEventHandlerCallback<T>[] = [];
     // Very simple event
-    const event : WorkflowEvent<T> = {
-        emit: (data: T)=>callbacks.forEach(handler=>handler(data)),
-        on: (handler)=>callbacks.push(handler),
+    const event: WorkflowEvent<T> = {
+        emit: (data: T) => callbacks.forEach(handler => handler(data)),
+        on: (handler) => callbacks.push(handler),
     }
     return event;
 }
 
-export function defineEvents<E>( options: WorkflowEventDefinition<E> ) {
+export function defineEvents<E>(options: WorkflowEventDefinition<E>) {
     return options;
 }
 
-export function defineEmits<E>(events: WorkflowEventDefinition<E> ) {    
+export function defineEmits<E>(events: WorkflowEventDefinition<E>) {
     const obj = Object.entries(events)
-        .map(([k,v])=>([k,v] as [string,WorkflowEvent<any>]) )
-        .reduce( (prev,[k,e])=> {
-            prev[k]=e.emit;
+        .map(([k, v]) => ([k, v] as [string, WorkflowEvent<any>]))
+        .reduce((prev, [k, e]) => {
+            prev[k] = e.emit;
             return prev;
         }, {} as any)
     return obj as WorkflowEventEmmiterDefition<E>;
 }
+

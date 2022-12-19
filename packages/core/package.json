@@ -5,19 +5,18 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [ "dist" ],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "jest --config jestconfig.json",
     "clean": "npm run clean:dist",
-    "clean:dist": "rimraf dist",    
+    "clean:dist": "rimraf dist",
     "build": "npm run clean && rollup -c rollup.config.js"
   },
   "keywords": [],
   "author": "Pablo Pérez <@dalotodo>",
   "license": "MIT",
-  "dependencies": {
-    "rxjs": "^7.6.0"
-  },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.1.0",
     "@rollup/plugin-typescript": "^10.0.1",
