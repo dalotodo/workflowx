@@ -11,8 +11,7 @@
   "keywords": [],
   "author": "Pablo Pérez <@dalotodo>",
   "license": "MIT",
-  "dependencies": {
-    "@workflowx/core": "file:packages/core",
+  "dependencies": {    
     "rxjs": "^7.6.0"
   },
   "devDependencies": {
