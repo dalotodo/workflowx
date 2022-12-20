@@ -1,43 +1,60 @@
-import { defineEmits, defineEvent, defineEvents, defineProcess, defineWorkflow } from "../src";
+import { eventOfType, IRuntimeEventBuilder, RuntimeEvent } from "../src";
 
-describe('Core Events', ()=> {
-    describe('defineEvent', ()=> {
+class MockBuilder implements IRuntimeEventBuilder {
+    calls : number = 0;
+    
+    buildEvent<T>(): RuntimeEvent<T> {
+        this.calls++;
+
+        const e: RuntimeEvent<T> = {
+            emit: ()=>{},
+            on: (callback)=>{}
+        }
+        return e;
+    }
+}
+
+describe('Core Events', () => {
+    describe('defineEvent', () => {
         type Item = { id: string; name: string }
 
-        test('Must create a boolean event', ()=>{
-            const event = defineEvent<boolean>();            
+        test('Must create a boolean event', () => {
+            const builder = new MockBuilder();
+
+            const def = eventOfType<boolean>();
+            expect(def).toBeDefined();
+            
+            const event = def()
             expect(event).toBeDefined();
-            expect(event.emit).toBeDefined();
-            expect(event.on).toBeDefined();
+            event(builder)
 
-            const value = true;
-
-            event.on( (data)=>expect(data).toEqual(value) );
-            event.emit(value);
+            expect(builder.calls).toEqual(1);
         });
 
-        test('Must create a string event', ()=>{
-            const event = defineEvent<string>();
+        test('Must create a string event', () => {
+            const builder = new MockBuilder();
+
+            const def = eventOfType<string>();
+            expect(def).toBeDefined();
+            
+            const event = def()
             expect(event).toBeDefined();
-            expect(event.emit).toBeDefined();
-            expect(event.on).toBeDefined();
+            event(builder)
 
-            const value = 'sample';
-
-            event.on( (data)=>expect(data).toEqual(value) );
-            event.emit(value);
+            expect(builder.calls).toEqual(1);
         });
 
-        test('Must create an Object event', ()=>{
-            const event = defineEvent<Item>();
+        test('Must create an Object event', () => {
+            const builder = new MockBuilder();
+
+            const def = eventOfType<Item[]>();
+            expect(def).toBeDefined();
+            
+            const event = def()
             expect(event).toBeDefined();
-            expect(event.emit).toBeDefined();
-            expect(event.on).toBeDefined();
+            event(builder)
 
-            const value : Item = { id: 'sample', name: 'Sample' };
-
-            event.on( (data)=>expect(data).toEqual(value) );
-            event.emit(value);
+            expect(builder.calls).toEqual(1);
         });
     })
 
