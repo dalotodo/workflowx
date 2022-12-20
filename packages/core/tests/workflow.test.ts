@@ -10,13 +10,19 @@ test('Basic workflow', () => {
 
     const wf = defineWorkflow({
         events,
-        setup: (ctx) => {
-            let expected: string;
-            ctx.on('expect', (value) => expected = value)
+        setup: (ctx, { defineProcess }) => {
 
-            ctx.on('test', (value) => {
-                expect(value).toEqual(expected);
-            })
+            let expected: string;
+
+            const main = defineProcess(()=> {
+                ctx.on('expect', (value) => expected = value)
+
+                ctx.on('test', (value) => {
+                    expect(value).toEqual(expected);
+                })
+            } )
+
+            return { main }            
         }
     });
 
