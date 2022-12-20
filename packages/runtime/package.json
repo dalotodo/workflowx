@@ -5,13 +5,14 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "test": "jest --config jestconfig.json",
+    "test": "jest --config jest.config.ts",
     "build": "rimraf dist && rollup -c rollup.config.js"
   },
   "keywords": [],
   "author": "Pablo Pérez <@dalotodo>",
   "license": "MIT",
-  "dependencies": {    
+  "dependencies": {
+    "@workflowx/core": "file:packages/core",
     "rxjs": "^7.6.0"
   },
   "devDependencies": {
