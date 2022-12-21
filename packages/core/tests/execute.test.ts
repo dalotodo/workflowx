@@ -34,7 +34,7 @@ describe('Workflow Execution Tests', () => {
     })
 
 
-    test('Workflow recursion', () => {
+    test('Workflow recursion', async () => {
         const events = defineEvents({
             start: eventOfType<number>(),
             calculate: eventOfType<number>(),
@@ -62,17 +62,19 @@ describe('Workflow Execution Tests', () => {
             }
         });
 
-        const sampleWorkflow = buildWorkflow(wf);
+        const SampleWorkflow = buildWorkflow(wf);
 
-        ((n: number) => {
+        const calculate = (n: number)=> {
             return new Promise<number>((resolve, reject) => {
-                const sample = sampleWorkflow();
+                const sample = SampleWorkflow();
                 sample.events.result.on((value) => resolve(value));
                 sample.events.start.emit(n);
-            })
-        })(4).then((value) => {
-            expect(value).toEqual(10)
-        })
+            });
+        }
+
+        expect( await calculate(4) ).toEqual(10);
+        expect( await calculate(5) ).toEqual(15);
+        
     })
 
 })
