@@ -1,30 +1,28 @@
-import { buildWorkflow, defineEvents, defineWorkflow, eventOfType } from '../src';
+import { defineEvent, defineProcess, defineWorkflow } from '../src';
 
 
 describe('Workflow Execution Tests', () => {
 
     test('Workflow runtime handles events', () => {
-        const events = defineEvents({
-            sample: eventOfType<string>(),
-        });
+        
 
         let expected: string = 'nothing';
 
-        const wf = defineWorkflow({
-            events,
-            setup: (ctx, { defineProcess }) => {
-                const main = defineProcess(() => {
-                    ctx.on('sample', (value) => expected = value)
-                })
+        const SampleWorkflow = defineWorkflow( (ctx)=> {
+            const sample = defineEvent<string>();
+            
+            const main = defineProcess(() => {
+                sample.on( (value) => expected = value )
+            })
 
-                return { main };
-            }
+            return { 
+                events: {sample},
+                processes: { main }
+            };            
         });
+        
 
-
-        const sampleWorkflow = buildWorkflow(wf);
-
-        const sample = sampleWorkflow();
+        const sample = SampleWorkflow();
 
         sample.events.sample.emit('sample01');
         expect(expected).toEqual('sample01');
@@ -34,37 +32,36 @@ describe('Workflow Execution Tests', () => {
     })
 
 
-    test('Workflow recursion', async () => {
-        const events = defineEvents({
-            start: eventOfType<number>(),
-            calculate: eventOfType<number>(),
-            result: eventOfType<number>(),
-        });
+    it('should calculate using self calls to an event', async () => {
+        const SampleWorkflow = defineWorkflow((ctx) => {
 
-        const wf = defineWorkflow({
-            events,
-            setup: (ctx, { defineProcess }) => {
-                let result = 0;
+            const start = defineEvent<number>();
+            const calculate = defineEvent<number>();
+            const result = defineEvent<number>();
 
-                const main = defineProcess(() => {
-                    ctx.on('start', (value) => {
-                        ctx.emit('calculate', value);
-                    })
 
-                    ctx.on('calculate', (value) => {
-                        if (value === 0) return ctx.emit('result', result);
-                        result += value;
-                        ctx.emit('calculate', value - 1);
-                    })
+            let current = 0;
+
+            const main = defineProcess(() => {
+                start.on((value) => {
+                    calculate.emit(value);
                 })
 
-                return { main };
-            }
+                calculate.on((value) => {
+                    if (value === 0) return result.emit(current);
+                    current += value;
+                    calculate.emit(value - 1);
+                })
+            });
+
+
+            return {
+                events: { start, result },
+                processes: { main }
+            };
         });
 
-        const SampleWorkflow = buildWorkflow(wf);
-
-        const calculate = (n: number)=> {
+        const calculate = (n: number) => {
             return new Promise<number>((resolve, reject) => {
                 const sample = SampleWorkflow();
                 sample.events.result.on((value) => resolve(value));
@@ -72,9 +69,9 @@ describe('Workflow Execution Tests', () => {
             });
         }
 
-        expect( await calculate(4) ).toEqual(10);
-        expect( await calculate(5) ).toEqual(15);
-        
+        expect(await calculate(4)).toEqual(10);
+        expect(await calculate(5)).toEqual(15);
+
     })
 
 })

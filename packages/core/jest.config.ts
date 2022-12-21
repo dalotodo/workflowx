@@ -1,10 +1,13 @@
 import { Config } from 'jest'
 
 const config: Config = {    
+    testMatch: [
+      "**/?(*.)+(spec|test).+(ts|tsx|js)"
+    ],
     transform: {
-      "^.+\\.(t|j)sx?$": "ts-jest"
+      "^.+\\.(ts|tsx)$": "ts-jest"
     },
-    testRegex: "(/tests/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    // testRegex: "(/tests/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"]
 }
 

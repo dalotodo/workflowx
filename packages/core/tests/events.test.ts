@@ -1,61 +1,58 @@
-import { eventOfType, IRuntimeEventBuilder, RuntimeEvent } from "../src";
+import { defineEvent } from "../src";
 
-class MockBuilder implements IRuntimeEventBuilder {
-    calls : number = 0;
-    
-    buildEvent<T>(): RuntimeEvent<T> {
-        this.calls++;
-
-        const e: RuntimeEvent<T> = {
-            emit: ()=>{},
-            on: (callback)=>{}
-        }
-        return e;
-    }
-}
 
 describe('Core Events', () => {
     describe('defineEvent', () => {
         type Item = { id: string; name: string }
 
         test('Must create a boolean event', () => {
-            const builder = new MockBuilder();
+            const fn = jest.fn( (value: boolean)=> {} )
 
-            const def = eventOfType<boolean>();
-            expect(def).toBeDefined();
-            
-            const event = def()
+            const event = defineEvent<boolean>();
+
             expect(event).toBeDefined();
-            event(builder)
+            expect(event.emit).toBeDefined();
+            expect(event.on).toBeDefined();
 
-            expect(builder.calls).toEqual(1);
+            const value = true
+            event.on( fn )
+            event.emit(value);
+
+            expect(fn).toBeCalledWith(value)            
         });
 
         test('Must create a string event', () => {
-            const builder = new MockBuilder();
+            const fn = jest.fn( (value: string)=> {} )
 
-            const def = eventOfType<string>();
-            expect(def).toBeDefined();
-            
-            const event = def()
+            const event = defineEvent<string>();
+
             expect(event).toBeDefined();
-            event(builder)
+            expect(event.emit).toBeDefined();
+            expect(event.on).toBeDefined();
 
-            expect(builder.calls).toEqual(1);
+            const value = 'hello'
+            event.on( fn )
+            event.emit(value);
+
+            expect(fn).toBeCalledWith(value)            
         });
 
         test('Must create an Object event', () => {
-            const builder = new MockBuilder();
+            const fn = jest.fn( (value: Item)=> {} )
 
-            const def = eventOfType<Item[]>();
-            expect(def).toBeDefined();
-            
-            const event = def()
+            const event = defineEvent<Item>();
+
             expect(event).toBeDefined();
-            event(builder)
+            expect(event.emit).toBeDefined();
+            expect(event.on).toBeDefined();
 
-            expect(builder.calls).toEqual(1);
+            const value : Item = { id: '1', name: 'Item #1'}
+            event.on( fn )
+            event.emit(value);
+
+            expect(fn).toBeCalledWith(value)            
         });
+
     })
 
 })
