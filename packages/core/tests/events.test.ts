@@ -53,6 +53,15 @@ describe('Core Events', () => {
             expect(fn).toBeCalledWith(value)            
         });
 
+        test('Must be callable directly', ()=> {
+            const event = defineEvent<number>();
+
+            let assigned : number = 0;
+            event.on( (value)=>assigned=value);
+            event(3);
+            expect(assigned).toEqual(3);
+        })
+
     })
 
 })
