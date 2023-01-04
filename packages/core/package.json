@@ -12,8 +12,10 @@
     "test": "jest --config jest.config.ts --silent=false",
     "test:ui": "majestic --config jest.config.ts",
     "clean": "npm run clean:dist",
-    "clean:dist": "rimraf dist",
-    "build": "npm run clean && rollup -c rollup.config.js"
+    "clean:dist": "rimraf dist/",
+    "build": "npm run clean && npm run build:rollup && npm run build:cleanup",
+    "build:rollup": "rollup -c rollup.config.js",
+    "build:cleanup": "rimraf dist/types/"
   },
   "keywords": [],
   "author": "Pablo Pérez <@dalotodo>",
