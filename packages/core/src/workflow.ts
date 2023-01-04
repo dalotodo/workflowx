@@ -4,7 +4,7 @@ type IEventEmitter<T> = (...data: T[]) => void;
 type IEventHandlerCallback<T> = (data: T) => void;
 type IEventHandler<T> = (callback: IEventHandlerCallback<T>) => void;
 
-interface IEvent<T> extends IEventEmitter<T> {
+export interface IEvent<T> extends IEventEmitter<T> {
   emit: IEventEmitter<T>;
   on: IEventHandler<T>;
 }
@@ -27,6 +27,10 @@ export function defineEvent<T>() {
     return _f as IEvent<T>;
   })();
   return event;
+}
+
+export function defineHandler<T>(event: IEvent<T>, callback: IEventHandlerCallback<T> ) {
+    event.on( callback );
 }
 
 type IProcess<T> = {
@@ -64,7 +68,7 @@ export function defineWorkflow<E, P>(
       runtime: { workflowId, executionId },
     };
 
-    const workflow: WorkflowDef<E, P> = setup(context);
+    const workflow: WorkflowDef<E, P> = setup(context);    
 
     // Init processes
     Object.keys(workflow.processes)
