@@ -1,4 +1,4 @@
-import { defineEvent, defineProcess, defineWorkflow } from "../../src";
+import { defineEvent, defineHandler, defineProcess, defineWorkflow } from "../../src";
 
 test('Import workflow sample test', () => {
     type Item = { id: string; name: string; }
@@ -12,7 +12,7 @@ test('Import workflow sample test', () => {
 
         const validator = defineProcess(() => {
             const isValid = (item: Item) => item.id.length <= 5;
-            readItems.on((items) => {
+            defineHandler( readItems, (items) => {
 
                 items.forEach((item) => {
                     if (isValid(item)) return itemIsValid.emit(item);
@@ -22,8 +22,8 @@ test('Import workflow sample test', () => {
         });
 
         const store = defineProcess(() => {
-            itemIsValid.on((item) => saveItem.emit(item));
-            itemIsNotValid.on((item) => { /* Discard */ } );
+            defineHandler( itemIsValid, (item) => saveItem.emit(item) );
+            defineHandler( itemIsNotValid, (item) => { /* Discard */ } );
         });
 
         return {
